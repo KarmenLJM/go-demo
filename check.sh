@@ -4,8 +4,8 @@ set -euo pipefail
 rm -rf coverdata
 mkdir coverdata
 
-GOCOVERDIR=coverdata \
-go run -cover -coverpkg=./... -covermode=atomic . &   # ← 后台启动
+env GOCOVERDIR=coverdata \
+go run -cover -coverpkg=./... -covermode=atomic . &
 PID=$!
 echo -e "$PID"
 
