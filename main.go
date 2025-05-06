@@ -9,10 +9,13 @@ import (
 
 func main() {
 	http.HandleFunc("/hello", helloHandler)
+	http.HandleFunc("/sum", sumHandler)
 
-	fmt.Println("Server started at :8080")
+	//fmt.Println("Server started at :8080")
+	fmt.Println("Server started at :8176")
 	fmt.Println("GOCOVERDIR:", os.Getenv("GOCOVERDIR")) // 打印 GOCOVERDIR 环境变量的值
-	http.ListenAndServe(":8080", nil)
+	//http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8176", nil)
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
