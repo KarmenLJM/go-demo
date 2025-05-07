@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/pprof"
 	_ "net/http/pprof" // 导入 pprof 包，注册 /debug/pprof 端点
@@ -9,24 +10,26 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-	http.HandleFunc("/sum", sumHandler)
-
 	mux := http.NewServeMux()
-	mux.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
 
+	// 业务
+	mux.HandleFunc("/hello", helloHandler)
+	mux.HandleFunc("/sum", sumHandler)
+
+	// who-am-I
 	mux.HandleFunc("/whoami", func(w http.ResponseWriter, _ *http.Request) {
 		h, _ := os.Hostname()
-		fmt.Println(w, h)
+		fmt.Fprintln(w, h) // 写到 HTTP 响应里
 	})
 
-	//registerPprof(mux)
+	// pprof
+	registerPprof(mux)
 
-	//fmt.Println("Server started at :8080")
 	fmt.Println("Server started at :8176")
 	fmt.Println("GOCOVERDIR:", os.Getenv("GOCOVERDIR")) // 打印 GOCOVERDIR 环境变量的值
-	//http.ListenAndServe(":8080", nil)
-	http.ListenAndServe(":8176", nil)
+
+	log.Println("listen :8176")
+	log.Fatal(http.ListenAndServe(":8176", mux)) // ← 传入 mux  // nil = DefaultServeMux
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,10 +54,10 @@ func registerPprof(mux *http.ServeMux) {
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
-	// 其余的 profile（heap、goroutine、mutex、coverage…）用 Handler(name)
+	// 其它 profile（一定要把 coverage 带上）
 	for _, p := range []string{
 		"allocs", "block", "goroutine", "heap",
-		"mutex", "threadcreate", "coverage", // coverage 需 Go 1.22+
+		"mutex", "threadcreate", "coverage",
 	} {
 		mux.Handle("/debug/pprof/"+p, pprof.Handler(p))
 	}
