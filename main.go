@@ -5,9 +5,18 @@ import (
 	"log"
 	"net/http"
 	"net/http/pprof"
-	_ "net/http/pprof" // 导入 pprof 包，注册 /debug/pprof 端点
+	runtimepprof "runtime/pprof"
+	//_ "net/http/pprof" // 导入 pprof 包，注册 /debug/pprof 端点
 	"os"
 )
+
+func init() {
+	if runtimepprof.Lookup("coverage") != nil {
+		fmt.Println("coverage enabled = true")
+	} else {
+		fmt.Println("coverage enabled = false")
+	}
+}
 
 func main() {
 	mux := http.NewServeMux()
