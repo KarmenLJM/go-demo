@@ -11,6 +11,7 @@ import (
 )
 
 func init() {
+	fmt.Println("GOCOVERDIR =", os.Getenv("GOCOVERDIR"))
 	if runtimepprof.Lookup("coverage") != nil {
 		fmt.Println("coverage enabled = true")
 	} else {
